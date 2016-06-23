@@ -5,6 +5,9 @@ get '/' do
 end
 
 post '/' do
-  puts "SUBMIT"
-  "ok"
+  if ENV["SECRET"] && ENV["SECRET"] != params["SECRET"]
+    403
+  else
+    200
+  end
 end
