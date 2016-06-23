@@ -33,9 +33,17 @@ post '/' do
   if ENV["SECRET"] && ENV["SECRET"] != params["SECRET"]
     403
   else
-    client.trigger('presence-competition', 'winner', {
-      name: 'BEN'
-    })
-    200
+    winner = client.channel_users('presence-competition')[:users].sample
+
+    if winner
+      client.trigger('presence-competition', 'winner', {
+        user: winner
+      })
+
+      200
+    else
+      [500, "no players"]
+    end
+
   end
 end

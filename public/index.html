@@ -21,12 +21,15 @@
         box-shadow: #000 0 0 40px;
 
         /* todo - prefix */
-        transition: transform 2s;
+        transition: 2s;
       }
 
-      .cover {
+      #dot.cover {
         /* todo - prefix */
         transform: scale(4.5,4)
+      }
+      #dot.won {
+        background: red;
       }
 
       body {
@@ -58,7 +61,18 @@
 
           channel = pusher.subscribe('presence-competition')
           channel.bind('winner', function(data) {
-            alert(data.name + " won")
+            // alert(data.name + " won")
+            console.log(data)
+
+            if(data.user.id == channel.members.myID) {
+              // alert("WIN")
+
+              dot.className = 'won'
+
+              setTimeout(function(){
+                dot.className = ''
+              },2000)
+            }
           });
 
         })
