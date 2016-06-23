@@ -22,11 +22,18 @@ get '/config' do
        cluster: ENV["PUSHER_CLUSTER"]
 end
 
+post '/pusher/auth' do
+  puts params.inspect
+  json client.authenticate(params[:channel_name], params[:socket_id], {
+    user_id: params[:socket_id]
+  })
+end
+
 post '/' do
   if ENV["SECRET"] && ENV["SECRET"] != params["SECRET"]
     403
   else
-    client.trigger('competition', 'winner', {
+    client.trigger('presence-competition', 'winner', {
       name: 'BEN'
     })
     200

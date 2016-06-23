@@ -46,7 +46,7 @@
         dot.className = ''
       },100)
 
-      var pusher;
+      var pusher, channel;
 
       fetch('/config')
         .then(function(res){return res.json()})
@@ -56,9 +56,9 @@
             encrypted: true
           })
 
-          var channel = pusher.subscribe('competition');
+          channel = pusher.subscribe('presence-competition')
           channel.bind('winner', function(data) {
-            alert(data.message);
+            alert(data.name + " won")
           });
 
         })
