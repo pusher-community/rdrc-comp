@@ -1,5 +1,6 @@
 require 'dotenv'
 require 'sinatra'
+require "sinatra/json"
 require 'pusher'
 
 Dotenv.load
@@ -14,6 +15,11 @@ client = Pusher::Client.new(
 
 get '/' do
   send_file File.join(settings.public_folder, 'index.html')
+end
+
+get '/config' do
+  json key: ENV["PUSHER_APP_KEY"],
+       cluster: ENV["PUSHER_CLUSTER"]
 end
 
 post '/' do

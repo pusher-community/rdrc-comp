@@ -38,10 +38,30 @@
   <body>
     <div id="dot" class="cover"></div>
 
+    <script src="bower_components/es6-promise/es6-promise.js"></script>
+    <script src="bower_components/fetch/fetch.js"></script>
+    <script src="bower_components/pusher/dist/web/pusher.js"></script>
     <script type="text/javascript">
       setTimeout(function(){
         dot.className = ''
       },100)
+
+      var pusher;
+
+      fetch('/config')
+        .then(function(res){return res.json()})
+        .then(function(config){
+          pusher = new Pusher(config.key, {
+            cluster: config.cluster,
+            encrypted: true
+          })
+
+          var channel = pusher.subscribe('competition');
+          channel.bind('winner', function(data) {
+            alert(data.message);
+          });
+
+        })
     </script>
   </body>
 </html>
