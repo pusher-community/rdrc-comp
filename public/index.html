@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>rdrc</title>
+    <style media="screen">
+      #dot {
+        /* TODO vmin fallback */
+        width: 80vmin;
+        height: 80vmin;
+        background: #fff;
+        border-radius: 100%;
+        display: inline-block;
+
+        position: absolute;
+        top:50%;
+        left:50%;
+        margin-top:-40vmin;
+        margin-left:-40vmin;
+
+        box-shadow: #000 0 0 40px;
+
+        /* todo - prefix */
+        transition: transform 2s;
+      }
+
+      .cover {
+        /* todo - prefix */
+        transform: scale(4.5,4)
+      }
+
+      body {
+        background: #3e3c3c
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="dot" class="cover"></div>
+
+    <script type="text/javascript">
+      setTimeout(function(){
+        dot.className = ''
+      },100)
+    </script>
+  </body>
+</html>
