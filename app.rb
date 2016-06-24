@@ -38,6 +38,10 @@ post '/' do
       client.trigger('presence-competition', 'reload', {})
       return [200, 'reloaded']
 
+    when "reset"
+      client.trigger('presence-competition', 'reset', {})
+      return [200, 'reset']
+
     when "win"
       winner = client.channel_users('presence-competition')[:users].sample
 
@@ -50,6 +54,20 @@ post '/' do
       else
         [500, "no players"]
       end
+
+    when "quick-win"
+      winner = client.channel_users('presence-competition')[:users].sample
+
+      if winner
+        client.trigger('presence-competition', 'quick-winner', {
+          user: winner
+        })
+
+        [200, "(quick) winner #{winner["id"]}!"]
+      else
+        [500, "no players"]
+      end
+
     end
 
   end

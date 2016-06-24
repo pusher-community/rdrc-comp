@@ -104,6 +104,24 @@
             schedule(data.user.id == channel.members.myID)
           })
 
+
+          channel.bind('quick-winner', function(data) {
+            _schedule = []
+            if(data.user.id == channel.members.myID) {
+              win()
+            } else {
+              lose()
+            }
+          })
+
+
+          channel.bind('reset', function(data) {
+            _schedule = []
+            reset()
+          })
+
+
+
           // channel.bind('winner-quick', function(data) {
           //   schedule(data.user.id == channel.members.myID)
           // })
