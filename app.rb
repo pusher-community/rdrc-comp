@@ -23,7 +23,6 @@ get '/config' do
 end
 
 post '/pusher/auth' do
-  puts params.inspect
   json client.authenticate(params[:channel_name], params[:socket_id], {
     user_id: params[:socket_id]
   })
@@ -33,16 +32,24 @@ post '/' do
   if ENV["SECRET"] && ENV["SECRET"] != params["SECRET"]
     403
   else
-    winner = client.channel_users('presence-competition')[:users].sample
 
-    if winner
-      client.trigger('presence-competition', 'winner', {
-        user: winner
-      })
+    case params["submit"]
+    when "reload"
+      client.trigger('presence-competition', 'reload', {})
+      return [200, 'reloaded']
 
-      200
-    else
-      [500, "no players"]
+    when "win"
+      winner = client.channel_users('presence-competition')[:users].sample
+
+      if winner
+        client.trigger('presence-competition', 'winner', {
+          user: winner
+        })
+
+        [200, "winner #{winner["id"]}!"]
+      else
+        [500, "no players"]
+      end
     end
 
   end

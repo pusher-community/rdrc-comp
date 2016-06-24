@@ -39,9 +39,6 @@
         /* todo - prefix */
         transform: scale(4)
       }
-      #dot.won {
-        background: red;
-      }
 
       #dot.fast {
         transition: 0.2s;
@@ -102,20 +99,18 @@
           })
 
           channel = pusher.subscribe('presence-competition')
+
           channel.bind('winner', function(data) {
-            // alert(data.name + " won")
-            console.log(data)
+            schedule(data.user.id == channel.members.myID)
+          })
 
-            if(data.user.id == channel.members.myID) {
-              // alert("WIN")
+          // channel.bind('winner-quick', function(data) {
+          //   schedule(data.user.id == channel.members.myID)
+          // })
 
-              dot.className = 'won'
-
-              setTimeout(function(){
-                dot.className = ''
-              },2000)
-            }
-          });
+          channel.bind('reload', function(data) {
+            window.location.reload()
+          })
 
         })
 
@@ -128,6 +123,7 @@
           '#b5fffd', // light aqua
           '#000', // black
           '#fff', // white
+          '#ca1425' // red (WINNER)
         ]
 
         var c = Math.floor(Math.random() * (colours.length-1));
@@ -146,14 +142,28 @@
           dot.style.backgroundColor = colours[c]
 
           if(window.navigator.vibrate) {
-            window.navigator.vibrate(100)
+            window.navigator.vibrate(80)
           }
         }
 
 
         function win() {
           dot.className = 'fast'
-          dot.style.backgroundColor = red
+          dot.style.backgroundColor = red;
+
+          ping(cscale[0], 0.9)
+          setTimeout(function(){
+            ping(cscale[0], 0.9)
+            if(window.navigator.vibrate) {
+              window.navigator.vibrate(600)
+            }
+          }, 1000)
+          setTimeout(function(){
+            ping(cscale[0], 0.9)
+            if(window.navigator.vibrate) {
+              window.navigator.vibrate(900)
+            }
+          }, 3000)
         }
 
         function lose() {
@@ -181,87 +191,103 @@
         }
         requestAnimationFrame(process)
 
-        function schedule() {
-
-          // 1s
-          //
-          // setTimeout(function(){
-          //   step()
-          //   ping(cscale[Math.floor(Math.random(cscale.length))])
-          // }, 500)
-          //
-          // setTimeout(function(){
-          //   step()
-          //   ping(cscale[Math.floor(Math.random(cscale.length))])
-          // }, 2000)
-          //
-          // setTimeout(function(){
-          //   step()
-          //   ping(cscale[Math.floor(Math.random(cscale.length))])
-          // }, 3000)
-          //
-          // setTimeout(function(){
-          //   step()
-          //   ping(cscale[Math.floor(Math.random(cscale.length))])
-          // }, 4000)
-
+        function schedule(is_winner) {
 
           // slightly more predictable
           var now = window.performance.now()
 
           _schedule = [
-            {t: 2000, fn: function(){
-              step()
+            {t: 0, fn: function(){
+              // start off with black
+              step(5)
             }},
-            {t: 2000, fn: function(){
-              step()
+            {t: 3000, fn: function(){
+              // then red
+              step(7)
             }},
-            {t: 2000, fn: function(){
-              step()
+            {t: 6000, fn: function(){
+              step(1)
             }},
-            {t: 2000, fn: function(){
+            {t: 1000, fn: function(){
+              step(2)
+            }},
+            {t: 1000, fn: function(){
+              step(3)
+            }},
+            {t: 1000, fn: function(){
+              step(4)
+            }},
+            {t: 1000, fn: function(){
               step(5)
             }},
 
 
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.3)
+            {t: 8000, fn: function(){
+              step(1)
+              ping(cscale[0], 0.3)
             }},
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.3)
+            {t: 1000, fn: function(){
+              step(2)
+              ping(cscale[1], 0.3)
             }},
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.3)
+            {t: 1000, fn: function(){
+              step(3)
+              ping(cscale[2], 0.3)
             }},
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.3)
+            {t: 1000, fn: function(){
+              step(4)
+              ping(cscale[3], 0.3)
             }},
-
-
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.4)
+            {t: 1000, fn: function(){
+              step(1)
+              ping(cscale[4], 0.3)
             }},
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.5)
+            {t: 1000, fn: function(){
+              step(6)
+              ping(cscale[5], 0.3)
             }},
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.6)
-            }},
-            {t: 2000, fn: function(){
-              step()
-              ping(r(cscale), 0.6)
+            {t: 1000, fn: function(){
+              step(5)
+              ping(cscale[6], 0.3)
             }},
 
-            {t: 2000, fn: function(){
+
+            {t: 7000, fn: function(){
+              step(1)
+              ping(cscale[0], 0.3)
+            }},
+
+            t(1000,0.4),
+            t(1000,0.4),
+            t(800,0.4),
+            t(800,0.5),
+
+            // screw it
+
+            t(800,0.4), t(800,0.5), t(800,0.5), t(800,0.5), t(800,0.5), t(800,0.5), t(800,0.6), t(500,0.6), t(500,0.6), t(500,0.6), t(500,0.6), t(500,0.6), t(500,0.6), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7),
+
+
+            t(400,0.7),
+            t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7), t(400,0.7),
+
+
+
+            t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7),
+            t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7),
+            t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7),
+            t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7), t(200,0.7),
+
+            t(200,0.7), t(300,0.7), t(400,0.7), t(500,0.7), t(600,0.7), t(700,0.7), t(800,0.7), t(900,0.7),
+
+
+
+            {t: 1000, fn: function(){
               step()
-              win()
+              if(is_winner) {
+                win()
+              } else {
+                lose()
+              }
             }}
 
 
@@ -272,6 +298,12 @@
           })
 
 
+          function t(x,y) {
+            return {t: x, fn: function(){
+              step()
+              ping(r(cscale), y)
+            }}
+          }
         }
 
 
@@ -316,8 +348,8 @@ function ping(frequency, volume){
   now = context.currentTime;
   vca.gain.cancelScheduledValues(now);
   vca.gain.exponentialRampToValueAtTime(volume || 0.8, now + 0.25);
-  vca.gain.exponentialRampToValueAtTime(zero, now + 1)
-  vca.gain.setTargetAtTime(zero, now + 2, zero)
+  vca.gain.exponentialRampToValueAtTime(zero, now + 2)
+  vca.gain.setTargetAtTime(zero, now + 4, zero)
 
 
   // Patchbay
