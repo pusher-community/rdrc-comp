@@ -5,21 +5,31 @@
     <title>rdrc</title>
     <meta name="viewport" content="initial-scale=1">
     <style media="screen">
+      body {
+        overflow: hidden;
+      }
       #dot {
-        /* TODO vmin fallback */
+
+        /* vmin fallback */
+        width: 10em;
+        height: 10em;
+        margin-top:-5em;
+        margin-left:-5em;
+
+
         width: 80vmin;
         height: 80vmin;
         background: #fff;
         border-radius: 100%;
         display: inline-block;
 
-        position: absolute;
+        position: fixed;
         top:50%;
         left:50%;
         margin-top:-40vmin;
         margin-left:-40vmin;
 
-        box-shadow: #000 0 0 40px;
+        box-shadow: rgba(0,0,0,0.7) 0 0 40px;
 
         /* todo - prefix */
         transition: 2s;
@@ -27,10 +37,14 @@
 
       #dot.cover {
         /* todo - prefix */
-        transform: scale(4.5,4)
+        transform: scale(4)
       }
       #dot.won {
         background: red;
+      }
+
+      #dot.fast {
+        transition: 0.2s;
       }
 
       body {
@@ -46,6 +60,33 @@
     <script src="bower_components/fetch/fetch.js"></script>
     <script src="bower_components/pusher/dist/web/pusher.js"></script>
     <script type="text/javascript">
+
+      // https://gist.github.com/paulirish/5438650
+      (function(){
+
+        if ("performance" in window == false) {
+            window.performance = {};
+        }
+
+        Date.now = (Date.now || function () {  // thanks IE8
+      	  return new Date().getTime();
+        });
+
+        if ("now" in window.performance == false){
+
+          var nowOffset = Date.now();
+
+          if (performance.timing && performance.timing.navigationStart){
+            nowOffset = performance.timing.navigationStart
+          }
+
+          window.performance.now = function now(){
+            return Date.now() - nowOffset;
+          }
+        }
+
+      })();
+
       setTimeout(function(){
         dot.className = ''
       },100)
@@ -77,6 +118,224 @@
           });
 
         })
+
+        var red = '#ca1425' // red
+        var colours = [
+          '#1b6cb7', // blue
+          '#5bb71b', // green
+          '#f7ff25', // yellow
+          '#fba3e3', // pink
+          '#b5fffd', // light aqua
+          '#000', // black
+          '#fff', // white
+        ]
+
+        var c = Math.floor(Math.random() * (colours.length-1));
+
+        // pick a new colour
+        function step(i){
+
+          if(typeof i != 'undefined')
+            c = i
+          else
+            c += Math.floor(Math.random() * (colours.length-2)) + 1
+
+          c = c % colours.length
+
+          dot.className = 'fast'
+          dot.style.backgroundColor = colours[c]
+
+          if(window.navigator.vibrate) {
+            window.navigator.vibrate(100)
+          }
+        }
+
+
+        function win() {
+          dot.className = 'fast'
+          dot.style.backgroundColor = red
+        }
+
+        function lose() {
+          dot.className = 'fast'
+          dot.style.backgroundColor = '#000'
+        }
+
+        function reset() {
+          dot.className = ''
+          dot.style.backgroundColor = ''
+          document.body.style.backgroundColor = ''
+        }
+
+        var _schedule = []
+        // look for any scheduled items, and pass
+        function process(t){
+          _schedule = _schedule.filter(function(s){
+            if(s.t < t) {
+              s.fn()
+            } else {
+              return true
+            }
+          })
+          requestAnimationFrame(process)
+        }
+        requestAnimationFrame(process)
+
+        function schedule() {
+
+          // 1s
+          //
+          // setTimeout(function(){
+          //   step()
+          //   ping(cscale[Math.floor(Math.random(cscale.length))])
+          // }, 500)
+          //
+          // setTimeout(function(){
+          //   step()
+          //   ping(cscale[Math.floor(Math.random(cscale.length))])
+          // }, 2000)
+          //
+          // setTimeout(function(){
+          //   step()
+          //   ping(cscale[Math.floor(Math.random(cscale.length))])
+          // }, 3000)
+          //
+          // setTimeout(function(){
+          //   step()
+          //   ping(cscale[Math.floor(Math.random(cscale.length))])
+          // }, 4000)
+
+
+          // slightly more predictable
+          var now = window.performance.now()
+
+          _schedule = [
+            {t: 2000, fn: function(){
+              step()
+            }},
+            {t: 2000, fn: function(){
+              step()
+            }},
+            {t: 2000, fn: function(){
+              step()
+            }},
+            {t: 2000, fn: function(){
+              step(5)
+            }},
+
+
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.3)
+            }},
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.3)
+            }},
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.3)
+            }},
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.3)
+            }},
+
+
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.4)
+            }},
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.5)
+            }},
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.6)
+            }},
+            {t: 2000, fn: function(){
+              step()
+              ping(r(cscale), 0.6)
+            }},
+
+            {t: 2000, fn: function(){
+              step()
+              win()
+            }}
+
+
+
+          ].map(function(item){
+            item.t = (now += item.t)
+            return item
+          })
+
+
+        }
+
+
+        function r(array){
+          return array[Math.floor(Math.random() * array.length)]
+        }
+        // start audio context on ios
+        var iosHack = function(){
+          ping(440, 0.001)
+          document.removeEventListener('touchstart', iosHack)
+        }
+        document.addEventListener('touchstart', iosHack, false)
+
+
+var cscale = [880, 783.99, 698.46, 659.26, 587.33, 523.25, 493.88]
+var pscale = [660, 990, 1485, 2227.5]
+var encounters = [392, 440, 349.23, 174.61, 261.63]
+/*
+E = 440 * 3 / 2 = 660
+B = 660 * 3 / 2 = 990
+F# = 990 * 3 / 2 = 1485
+C# = 1485 * 3 / 2 = 2227.5
+
+encounters.forEach((c,i) => setTimeout(function(){step(i);ping(c, 0.2)}, (i*700) + 100))
+
+*/
+
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+window.context = parent.context || new AudioContext();
+
+function ping(frequency, volume){
+  var zero = 0.0001;// FF doesn't like 0
+
+  var vco             = context.createOscillator();
+  vco.frequency.value = Math.round(frequency);
+
+  // VCA
+  var vca        = context.createGain();
+  vca.gain.value = zero;
+
+  // Envelope
+  now = context.currentTime;
+  vca.gain.cancelScheduledValues(now);
+  vca.gain.exponentialRampToValueAtTime(volume || 0.8, now + 0.25);
+  vca.gain.exponentialRampToValueAtTime(zero, now + 1)
+  vca.gain.setTargetAtTime(zero, now + 2, zero)
+
+
+  // Patchbay
+  vco.connect(vca);
+  vca.connect(context.destination);
+
+  vco.start(0);
+
+
+  setTimeout(function(){
+    vco.stop(0);
+    vco.disconnect();
+    vca.disconnect();
+  },2500)
+
+}
+
+
     </script>
   </body>
 </html>
